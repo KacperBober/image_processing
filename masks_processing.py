@@ -49,7 +49,13 @@ def main():
     fig, axs = plt.subplots(4)
     plot_histograms(r_histogram, g_histogram, b_histogram, gray_histogram, bins, fig, axs)
 
-    plt.show()
+    image_pixels = gray_image.getdata()
+    image_array = np.array(image_pixels)
+    image_array = image_array.reshape(gray_image.size[0], gray_image.size[1])
+
+    print(image_array)
+
+#    plt.show()
 
 
 if __name__ == '__main__':
