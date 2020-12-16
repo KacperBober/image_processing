@@ -3,6 +3,17 @@ import numpy as np
 from matplotlib import pyplot as plt
 from urllib import request
 
+""" wykonane podpunkty:
+    - wyrysowane histogramy dla odpowiednich kanałów kolorów oraz skali szarości
+    - pobrany obrazek bezpośrednio z sieci
+    - wykonanie konwersji do skali szarosci
+    - Zaimplementowanie filtru Sobela i krzyża Roberts'a
+    
+    Uzyskane wyniki: Histogramy rysują się podobne jak w gotowych generatorach internetowych. 
+    Konwersja do skali szarości wygląda przyzwoicie
+    Filtry nie wykonują się szybko, ale poprawnie
+"""
+
 
 def rgb_histograms(image):
     """creates arrays of histogram from input image"""
@@ -26,7 +37,7 @@ def rgb_histograms(image):
 
 
 def histogram(array):
-    """creates 255 for RGB colors"""
+    """creates 255 bins with occurrences of RGB colors"""
     bins = np.zeros(256)
     for index in range(0, len(array)):
         bins[array[index]] += 1
@@ -60,7 +71,7 @@ def plot_histograms(r, g, b, gray_scale, color_range, fig, axs):
     fig.tight_layout()
 
 
-def sobel_filter(pixel_array):
+def filters(pixel_array):
 
     width = pixel_array.shape[1]
     heigth = pixel_array.shape[0]
@@ -96,22 +107,26 @@ def calculate_horizontal_gradient(pixel_array, i, j):
     return pixel_array[i-1, j+1] * (-1) + pixel_array[i, j+1] * (-2) + pixel_array[i+1, j+1] * (-1) +\
         pixel_array[i-1, j-1] + pixel_array[i, j-1] * 2 + pixel_array[i+1, j-1]
 
+
 def main():
 
     link = "https://media.comicbook.com/2020/08/cyberpunk-2077-1--1233341-1280x0.jpeg"
     image: Image.Image = Image.open(request.urlopen(link))
 
+    # create arrays of histograms
     r_histogram, g_histogram, b_histogram, gray_array, gray_histogram, bins = rgb_histograms(image)
 
     fig, axs = plt.subplots(4)
     plot_histograms(r_histogram, g_histogram, b_histogram, gray_histogram, bins, fig, axs)
 
+    # create gray image
     mat = np.reshape(gray_array, (image.size[1], image.size[0]))
     gray_pixels = np.uint8(mat)
     gray_image = Image.fromarray(gray_pixels, 'L')
     gray_image.show()
 
-    sobel_pixels, roberts_pixels = sobel_filter(mat)
+    # create filtered images
+    sobel_pixels, roberts_pixels = filters(mat)
 
     sobel_contour = np.uint8(sobel_pixels)
     roberts_contour = np.uint8(roberts_pixels)
